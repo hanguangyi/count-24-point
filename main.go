@@ -4,7 +4,7 @@
 //Time：2018/04/23
 //I did not consider using slices to reduce memory usage for calls between functions call.
 
-//Package nextPermutation
+//Version 1.0 : Enumerate all the conditions
 
 package main
 
@@ -16,7 +16,7 @@ import (
 
 func main() {
 	flag := false
-	num := []int{6, 3, 6, 3}
+	num := []int{7, 1, 5, 6}
 	fmt.Println("Here count 24 point program begin.")
 	sort.Ints(num)
 	//fmt.Printf("sort numbers:%v\n", nums)
@@ -185,17 +185,17 @@ func dfs(sum, cur, m int, flag bool, num []int, expression []string) {
 		if expression[6] == "+" || expression[6] == "-" || expression[6] == "*" || expression[6] == "/" {
 			expressionC[13] = "C"
 			expressionC[2] = "+"
-			//expression1 := expression
+			//fmt.Printf("bill debug err IN C sum %d * cur %d :%s\r\n", sum, cur, expression)
 			dfs(sum+cur, num[m+1], m+1, flag, num, expressionC) //先计算前一部分
 
-			expressionC[2] = "-"
-			//expression2 := expression
-			dfs(sum-cur, num[m+1], m+1, flag, num, expressionC) //先计算前一部分
-
-			if expression[6] == "+" || expression[6] == "-" {
+			if expression[6] == "+" || expression[6] == "-" { //consider operator
 				expressionC[3] = "("
 				expressionC[9] = ")"
 			}
+
+			expressionC[2] = "-"
+			dfs(sum-cur, num[m+1], m+1, flag, num, expressionC) //先计算前一部分
+
 			expressionC[2] = "*"
 			dfs(sum*cur, num[m+1], m+1, flag, num, expressionC)
 
@@ -248,6 +248,7 @@ func dfs(sum, cur, m int, flag bool, num []int, expression []string) {
 					expression[0] = "("
 					expression[9] = ")"
 				}
+				//fmt.Printf("bill debug err sum %d * cur %d :%s\r\n", sum, cur, expression)
 				fmt.Printf("%v\n", expression[0:13])
 				flag = true
 
@@ -266,11 +267,17 @@ func dfs(sum, cur, m int, flag bool, num []int, expression []string) {
 				expression[6] = "+"
 				fmt.Printf("%v\n", expression[0:13])
 				flag = true
+				return
 			}
 			if sum-cur == 24 {
 				expression[6] = "-"
+				if expression[10] == "+" || expression[10] == "-" { //consider operators
+					expression[7] = "("
+					expression[12] = ")"
+				}
 				fmt.Printf("%v\n", expression[0:13])
 				flag = true
+				return
 			}
 			if sum*cur == 24 {
 				expression[6] = "*"
@@ -307,12 +314,17 @@ func dfs(sum, cur, m int, flag bool, num []int, expression []string) {
 			}
 			if sum-cur == 24 {
 				expression[10] = "-"
+				if expression[3] == "(" && expression[9] == ")" {
+					//pattern is not match.
+					flag = false
+					return
+				}
 				fmt.Printf("%v\n", expression[0:13])
 				flag = true
 			}
 			if sum*cur == 24 {
 				expression[10] = "*"
-				if expression[2] == "+" || expression[2] == "-" {
+				if expression[2] == "+" || expression[2] == "-" { //Consider operators
 					expression[0] = "("
 					expression[9] = ")"
 				}
